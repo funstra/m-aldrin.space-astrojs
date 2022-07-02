@@ -1,0 +1,111 @@
+---
+interface Props {
+    type?: 'fade' | 'slide'
+    class?: string
+    transform?: {
+        translate?: {
+            x?: number
+            y?: number
+        }
+        rotate?: number
+        scale?: {
+            x?: number
+            y?: number
+        }
+    }
+    transformAni?: {
+        translate?: {
+            x?: number
+            y?: number
+        }
+        rotate?: number
+        scale?: {
+            x?: number
+            y?: number
+        }
+    }
+    transformAniOut?: {
+        translate?: {
+            x?: number
+            y?: number
+        }
+        rotate?: number
+        scale?: {
+            x?: number
+            y?: number
+        }
+    }
+    style?: string
+    delay?: number
+    delayOut?: number
+    delayIn?: number
+    duration?: number
+    opacity?: number
+    opacityOut?: number
+    scale?: { x?: number, y?: number }
+    dir?: { x?: number, y?: number }
+    dirIn?: { x?: number, y?: number }
+    easing?: 'ease-out' | 'ease-in' | 'ease-in-out' | string
+    as?: keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap
+}
+const { type, class: c, style, transform, transformAni, transformAniOut, delay, delayOut, delayIn, duration, easing, opacity, opacityOut, scale, dir, dirIn, as } = Astro.props as Props
+const Tag = as || "div"
+const transformString = `rotate(${transform?.rotate ?? 0}deg) scale(${transform?.scale?.x ?? 1},${transform?.scale?.y ?? 1}) translate(${transform?.translate?.x ?? 0}%,${transform?.translate?.y ?? 0}%) `
+const transformStringAni = `rotate(${transformAni?.rotate ?? 0}deg) scale(${transformAni?.scale?.x ?? 1},${transformAni?.scale?.y ?? 1}) translate(${transformAni?.translate?.x ?? 0}%,${transformAni?.translate?.y ?? 0}%) `
+const transformStringAniOut = `rotate(${transformAniOut?.rotate ?? 0}deg) scale(${transformAniOut?.scale?.x ?? 1},${transformAniOut?.scale?.y ?? 1}) translate(${transformAniOut?.translate?.x ?? 0}%,${transformAniOut?.translate?.y ?? 0}%) `
+const _style = `
+    ${style !== undefined ? `${style};` : ''}
+    --transform:${transformString};
+    --transformAni:${transformStringAni};
+    --transformAniOut:${transformStringAniOut};
+    ${opacity !== undefined ? `--opacity:${opacity};` : ''}
+    ${opacityOut !== undefined ? `--opacityOut:${opacityOut};` : ''}
+    ${duration !== undefined ? `--duration:${duration}ms;` : ''}
+    --delay-out:${delayOut || delay || 0}ms;
+    --delay-in:${delayIn || delay || 0}ms;
+    ${easing !== undefined ? `--easing: ${easing};` : ''}
+    ${dir?.x !== undefined ? `--dir-x:${dir.x}px;` : ''}
+    ${dir?.y !== undefined ? `--dir-y:${dir.y}px;` : ''}
+    ${dirIn?.x !== undefined ? `--dir-in-x:${dirIn.x}px;` : ''}
+    ${dirIn?.y !== undefined ? `--dir-in-y:${dirIn.y}px;` : ''}
+    ${scale?.x !== undefined ? `--scale-x:${scale.x};` : ''}
+    ${scale?.y !== undefined ? `--scale-y:${scale.y};` : ''}
+    `
+---
+
+<Tag class={`transition-${type?type:'fade'} ${c}`} style={_style}>
+    <slot />
+</Tag>
+<style>
+    [class*=transition-] {
+        height: 100%;
+        width: 100%;
+    }
+</style>
+<style is:global>
+    [class*=transition-] {
+        transition-property: all;
+        transition-duration: var(--duration, 100ms);
+        /* transition-duration: 10000ms; */
+        transition-delay: var(--delay-in);
+        transition-timing-function: var(--easing);
+    }
+
+    .transition-fade {
+        /* transform-origin: left; */
+        transform: var(--transform);
+    }
+
+    html[class*="is-animating"] .transition-fade {
+        opacity: var(--opacity, 1);
+        transform: var(--transformAni);
+    }
+
+    html.is-animating-out .transition-fade {
+        /* opacity: var(--opacityOut, var(--opacity, 1)); */
+        /* opacity: var(--opacityOut,1); */
+        /* opacity: 0; */
+        transform: var(--transformAniOut, var(--transformAni));
+        transition-delay: var(--delay-out);
+    }
+</style>

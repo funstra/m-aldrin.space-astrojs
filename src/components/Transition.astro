@@ -1,0 +1,77 @@
+---
+interface transform {
+    rotate?: number
+    scale?: { x?: number, y?: number }
+    translate?: { x?: number, y?: number }
+}
+interface Props {
+    class?: string
+    as?: keyof HTMLElementTagNameMap | keyof SVGElementTagNameMap
+    in?: {
+        opacity?: number
+        transform?: transform
+        duration?: number
+    }
+    out?: {
+        opacity?: number
+        transform?: transform
+        duration?: number
+    }
+}
+const { class: _class, as, in: _in, out: _out } = Astro.props as Props
+const Tag = as || 'div'
+const inString = `
+${_in?.duration !== undefined ? `--in-duration:${_in.duration}ms;` : ''}
+${_in?.opacity !== undefined ? `--in-opacity:${_in.opacity};` : ''}
+${_in?.transform?.rotate !== undefined ? `--in-transform-rotate:rotate(${_in.transform.rotate}deg);` : ''} 
+${_in?.transform?.scale?.x !== undefined ? `--in-transform-scale-x:scaleX(${_in.transform.scale.x});` : ''} 
+${_in?.transform?.scale?.y !== undefined ? `--in-transform-scale-y:scaleY(${_in.transform.scale.y});` : ''} 
+${_in?.transform?.translate?.x !== undefined ? `--in-transform-translate-x:translateX(calc(var(--page-direction,1) * ${_in.transform.translate.x}px));` : ''} 
+${_in?.transform?.translate?.y !== undefined ? `--in-transform-translate-y:translateY(calc(var(--page-direction,1) * ${_in.transform.translate.y}px));` : ''} 
+`
+const outString = `
+${_out?.duration !== undefined ? `--out-duration:${_out.duration}ms;` : ''}
+${_out?.opacity !== undefined ? `--out-opacity:${_out.opacity};` : ''}
+${_out?.transform?.rotate !== undefined ? `--out-transform-rotate:rotate(${_out.transform.rotate}deg);` : ''} 
+${_out?.transform?.scale?.x !== undefined ? `--out-transform-scale-x:scaleX(${_out.transform.scale.x});` : ''} 
+${_out?.transform?.scale?.y !== undefined ? `--out-transform-scale-y:scaleY(${_out.transform.scale.y});` : ''} 
+${_out?.transform?.translate?.x !== undefined ? `--out-transform-translate-x:translateX(${_out.transform.translate.x}px);` : ''} 
+${_out?.transform?.translate?.y !== undefined ? `--out-transform-translate-y:translateY(${_out.transform.translate.y}px);` : ''} 
+`
+---
+
+<Tag class={`transitioner ${_class}`} style={`${inString}${outString}`}>
+    <slot />
+</Tag>
+<style>
+    [class*=transitioner] {
+        height: 100%;
+        width: 100%;
+    }
+</style>
+<style is:global>
+    [class*=transitioner] {
+        transition-property: all;
+        transition-duration: var(--in-duration, 200ms);
+        transition-delay: var(--delay-in);
+        transition-timing-function: var(--easing);
+    }
+
+    .transitioner {
+        will-change: transform, opacity;
+        /* transform: var(--transform); */
+    }
+
+    html[class*="is-animating"] .transitioner {
+        opacity: var(--in-opacity, 0);
+        --in-transform: var(--in-transform-rotate, rotate(0deg)) var(--in-transform-scale-x, scaleX(1)) var(--in-transform-scale-y, scaleY(1)) var(--in-transform-translate-x, translateX(0px)) var(--in-transform-translate-y, translateY(0px));
+        transform: var(--in-transform, rotate(0deg) scale(1) translate(0px, 0px));
+    }
+
+    /* html.is-animating-out .transitioner {
+        transition-duration: var(--out-duration, var(--in-duration, 200ms));
+        opacity: var(--out-opacity, var(--in-opacity, 0));
+        --out-transform: var(--out-transform-rotate, rotate(0deg)) var(--out-transform-scale-x, scaleX(1)) var(--out-transform-scale-y, scaleY(1)) var(--out-transform-translate-x, translateX(0px)) var(--out-transform-translate-y, translateY(0px));
+        transform: var(--out-transform, var(--in-transform, rotate(0deg) scale(1) translate(0px, 0px)));
+    } */
+</style>

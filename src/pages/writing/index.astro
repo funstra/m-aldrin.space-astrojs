@@ -1,0 +1,40 @@
+---
+// import Layout from '$layout/Base.astro'
+import Base from '$layout/Base.astro'
+const posts = await Astro.glob('./**/*.md')
+
+---
+
+<!-- <Layout title="writing" pageOrder={1}>
+    <ul class="posts">
+        {posts.map(post => (
+        <li>
+            <a  href={post.url}>{post.frontmatter.title}</a>
+        </li>
+        ))}
+    </ul>
+</Layout> -->
+
+<Base title="blablabla" pageOrder={1}>
+<div class="flex bg-yellow-100 w-1/2">
+    <ul class="posts bg-blue-200  overflow-hidden">
+        {posts.map(post => (
+        <li>
+            <a href={post.url}>toucca</a>
+        </li>
+        ))}
+        <!-- {
+        [1,2,3].map(n=>(
+        <li>
+            <a href={"/"+n}>{n}</a>
+        </li>
+        ))
+        } -->
+    </ul>
+    <!-- <svg viewBox="0 0 256 256">
+        <g transform="translate(128 128)">
+            <circle r="64" />
+        </g>
+    </svg> -->
+</div>
+</Base>

@@ -1,0 +1,69 @@
+---
+import "../styles/global.scss";
+import Nav from "../components/___Nav.astro";
+// import Nav from '../components/Nav.svelte'
+// import Test from "./Test.svelte";
+
+import Transition from "src/components/Transition.astro";
+
+export interface Props {
+	title: string;
+	class?: string
+	pageOrder?: number
+}
+
+const { title, class: _class, pageOrder } = Astro.props as Props;
+const navLinks = [
+	{ href: "/", name: "home" },
+	{ href: "/writing", name: "writing" },
+	{ href: "/work", name: "work" },
+]
+---
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width">
+	<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+	<title>{title}</title>
+	<!-- <script src="../rooter.ts" type="module"></script> -->
+</head>
+
+<body data-page-order={ pageOrder !==undefined ? pageOrder : -1 }>
+	<div class="loader"></div>
+	<Nav links={navLinks}></Nav>
+	<main class={`relative ${_class}`}>
+		<Transition in={{transform:{translate:{x:10}}}}>
+			<slot />
+		</Transition>
+	</main>
+</body>
+
+</html>
+
+<script>
+	import '../rooter.ts'
+</script>
+
+<style>
+	html {
+		overflow: hidden;
+	}
+
+	body {
+		display: grid;
+		grid-template-rows: 1fr auto;
+		border-radius: 4px;
+		overflow: hidden;
+	}
+
+	main {
+		grid-row: 1/3;
+		grid-column: 1/3;
+		overflow: scroll;
+		overflow-x: hidden;
+		/* overflow: hidden; */
+	}
+</style>
