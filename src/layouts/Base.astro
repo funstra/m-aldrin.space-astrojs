@@ -1,8 +1,6 @@
 ---
 import "../styles/global.scss";
 import Nav from "../components/___Nav.astro";
-// import Nav from '../components/Nav.svelte'
-// import Test from "./Test.svelte";
 
 import Transition from "src/components/Transition.astro";
 
@@ -32,7 +30,6 @@ const navLinks = [
 </head>
 
 <body data-page-order={ pageOrder !==undefined ? pageOrder : -1 }>
-	<div class="loader"></div>
 	<Nav links={navLinks}></Nav>
 	<main class={`relative ${_class}`}>
 		<Transition in={{transform:{translate:{x:10}}}}>
@@ -65,5 +62,6 @@ const navLinks = [
 		overflow: scroll;
 		overflow-x: hidden;
 		/* overflow: hidden; */
+		@apply p-1
 	}
 </style>

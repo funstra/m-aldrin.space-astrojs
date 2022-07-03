@@ -39,19 +39,42 @@ async function transition(href: string) {
 
     document.documentElement.classList.add('is-rooting')
     document.dispatchEvent(new Event('rooting'))
-    
+
     let target_document: Document
-    
+
     let _doc = roots.find(root => root.href === href)
     if (roots.some(root => root.href === href)) {
         // we allready know this root
         target_document = _doc.document.cloneNode(true) as Document
-        
+
     } else {
         // else do the fetching
         // get the target document
         document.dispatchEvent(new Event('rooter:fetching-start'))
         document.documentElement.classList.add('is-fetching')
+        // const target_document_string = await fetch(href).then(res => {
+        //     const reader = res.body.getReader()
+        //     return new ReadableStream({
+        //         start(controller) {
+        //             function juicer() {
+        //                 return reader.read().then(({ done, value }) => {
+        //                     if (done) {
+        //                         controller.close()
+        //                         return
+        //                     }
+        //                     console.log('chunk!', value);
+
+        //                     controller.enqueue(value)
+        //                     return juicer()
+        //                 })
+        //             }
+        //             return juicer()
+        //         }
+        //     })
+
+        // })
+        //     .then(stream => new Response(stream))
+        //     .then(res => res.text())
         const target_document_string = await fetch(href).then(res => res.text())
         target_document = new DOMParser().parseFromString(target_document_string, 'text/html')
         await diff_styles(target_document)
@@ -96,7 +119,6 @@ async function transition(href: string) {
         pageDirection = -1
     }
     document.body.dataset.pageOrder = targetOrder
-    console.log(pageDirection);
 
     document.documentElement.style.setProperty(`--page-direction`, pageDirection)
 

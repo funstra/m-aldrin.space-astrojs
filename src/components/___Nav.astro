@@ -12,8 +12,8 @@ const currentPage = new URL(Astro.request.url)
     import './Nav.ts'
 </script>
 
-<nav class="m-2">
-    <button class="justify-self-center border border-black/50 shadow-[20px] shadow-black/10  rounded-lg">
+<nav class="m-2" data-state="idle">
+    <button class="justify-self-center p-0.5 shadow-[4px] shadow-black/5  rounded-md">
         <svg height="16" viewBox="0 0 40 16" class="">
             <circle cx="8" cy="8" r="3" />
             <circle cx="20" cy="8" r="3" />
@@ -21,7 +21,7 @@ const currentPage = new URL(Astro.request.url)
         </svg>
     </button>
 
-    <ul data-state="closed" class="links flex flex-col gap-3 p-2 rounded-sm">
+    <ul data-state="closed" class="links shadow-[16px] shadow-black/10 flex flex-col gap-3 p-2 rounded-sm">
         {links.map(link => {
         return <a aria-current={ currentPage.pathname==link.href ? 'page' : false} class="p-1  rounded-sm border border-black border-dashed" href={link.href}>
             <Icons width={20} height={20} type={link.name} />
@@ -31,6 +31,16 @@ const currentPage = new URL(Astro.request.url)
 </nav>
 
 <style lang="scss">
+    @keyframes fetching {
+        0% {
+            background-position-y: 0;
+        }
+
+        100% {
+            background-position-y: 100%;
+        }
+    }
+
     nav {
         grid-row: 2;
         grid-column: 2;
@@ -43,6 +53,44 @@ const currentPage = new URL(Astro.request.url)
         // width: max-content;
         height: max-content;
         z-index: 10;
+
+        .links {
+            // animation-name: fetching;
+            // animation-duration: 1000ms;
+            // animation-iteration-count: infinite;
+            // transition-property: background-color;
+            // transition-duration: 500ms;
+        }
+    }
+
+
+    nav[data-state=fetching] .links {
+
+        // background-color: red;
+        // animation-name: fetching;
+        // animation-duration: 500ms;
+        // animation-iteration-count: infinite;
+        &::before {
+            // background-position-y: 75%;
+            animation-name: fetching;
+            animation-duration: 1500ms;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+            opacity: 1;
+        }
+
+    }
+
+    nav[data-state=done] .links {
+
+        // transition-dur`ation: 125ms;
+        // background-color: red !important;
+        &::before {
+            transition-timing-function: ease-out;
+            // transition-duration: 125ms;
+            // background-position-y: 100%;
+            opacity: 0;
+        }
     }
 
     button {
@@ -53,14 +101,34 @@ const currentPage = new URL(Astro.request.url)
     }
 
     .links {
+        position: relative;
         background-color: white;
         grid-row: 1;
         grid-column: 1;
-        box-shadow: 0 0 16px -4px hsl(0 0% 0% / 0.2);
+        // box-shadow: 0 0 16px -4px hsl(0 0% 0% / 0.2);
         transition: opacity, transform;
         transition-duration: 125ms;
         transition-timing-function: ease-out;
         align-items: center;
+        overflow: hidden;
+
+        &::before {
+            content: '';
+            width: 10%;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-size: 100% 10%;
+            position: absolute;
+            background-origin: border-box;
+            background-image: linear-gradient(transparent 49%, black 51%);
+            background-position-y: 0%;
+            opacity: 0;
+            transition-property: opacity;
+            transition-duration: 175ms;
+            transition-timing-function: ease-in;
+            transition-delay: 75ms;
+        }
     }
 
     .links[data-state=open] {
@@ -93,23 +161,6 @@ const currentPage = new URL(Astro.request.url)
         position: relative;
         transform: translate3d(0, 0, 0);
 
-        :global(svg) {
-            // overflow: hidden;
-            // background-color: orange;
-            // width: 20px;
-        }
-
-        // .background {
-        //     position: absolute;
-        //     left: 0;
-        //     top: 0;
-        //     width: 100%;
-        //     height: 100%;
-        //     background-color: aquamarine;
-        //     transform-origin: bottom;
-        //     transform: scaleY(0.1) translate3d(0, 0, 0);
-        // }
-
         &::after {
             width: 100%;
             height: 100%;
@@ -124,29 +175,26 @@ const currentPage = new URL(Astro.request.url)
             transition-duration: 125ms;
         }
 
-        // &:hover {
-        //     // --fg-col: white;
-        //     // --bg-col: black;
-        // }
     }
 
     :global(.navigating-to) {
-
-        .background {
-            // transform: scaleY(0.75);
-        }
 
         &::after {
             transform: scaleY(0.75) !important;
         }
     }
 
+
     :global([aria-current="page"]) {
-        color: white;
+
+        // color: white;
+        :global(svg) {
+            stroke: white !important;
+        }
+
         &::after {
             transform: scaleY(1) !important;
         }
 
-        // background-color: orange !important;
     }
 </style>
