@@ -1,15 +1,23 @@
 ---
 // import Layout from '$layout/Base.astro'
 import Layout from '$layout/Base.astro'
+import Transition from 'src/components/Transition.astro';
 const posts = await Astro.glob('./**/*.md')
 
 ---
-<Layout title="writing" pageOrder={1}>
-    <ul class="posts">
-        {posts.map(post => (
-        <li>
-            <a href={post.url}>{ post.frontmatter.title }</a>
-        </li>
-        ))}
-    </ul>
+
+<Layout title="writing" pageOrder={1} class="[&>*]:max-w-prose [&>*]:mx-auto">
+    <Transition in={{transform:{translate:{x:-5}}}} out={{transform:{translate:{x:5}}}}>
+        <ul class="posts">
+            {posts.map(post => (
+            <li>
+                <a href={post.url}>{ post.frontmatter.title }</a>
+            </li>
+            ))}
+        </ul>
+    </Transition>
+    <Transition in={{ delay:100 }} out={{delay:100}}>
+        <p>hello yoyo</p>
+    </Transition>
 </Layout>
+

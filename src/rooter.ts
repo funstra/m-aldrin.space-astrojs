@@ -38,7 +38,11 @@ async function transition(href: string) {
 
 
     document.documentElement.classList.add('is-rooting')
-    document.dispatchEvent(new Event('rooting'))
+    document.dispatchEvent(new CustomEvent('rooting', {
+        detail: {
+            root: location.pathname
+        }
+    }))
 
     let target_document: Document
 
@@ -85,8 +89,9 @@ async function transition(href: string) {
 
     }
 
+    let out_elements = document.querySelectorAll('[class*="transitioner"]')
     let out_animated_elements = [
-        ...document.querySelectorAll('[class*="transitioner"]')
+        ...out_elements
     ].map((el: HTMLElement) => {
         return new Promise<void>((resolve) => {
             el.addEventListener('transitionend', e => {
@@ -97,13 +102,15 @@ async function transition(href: string) {
             })
         })
     })
+    let in_elements = target_document.querySelectorAll('[class*="transitioner"]')
     let in_animated_elements = [
-        ...target_document.querySelectorAll('[class*="transitioner"]')
+        ...in_elements
     ].map((el: HTMLElement) => {
         return new Promise<void>((resolve) => {
             el.addEventListener('transitionend', e => {
                 if (e.target === el) {
                     // console.log(`transition-in ended`, e.target);
+                    el.classList.remove('fade')
                     resolve()
                 }
             })
@@ -113,10 +120,18 @@ async function transition(href: string) {
     const sourceOrder = document.body.dataset.pageOrder
     const targetOrder = target_document.body.dataset.pageOrder
     let pageDirection = 0
-    if (sourceOrder < targetOrder) {
-        pageDirection = 1
-    } else if (sourceOrder > targetOrder) {
-        pageDirection = -1
+    if (parseInt(sourceOrder) == -1 || parseInt(targetOrder) == -1) {
+
+        out_elements.forEach(elm => elm.classList.add('fade'))
+        in_elements.forEach(elm => elm.classList.add('fade'))
+    } else {
+
+        if (sourceOrder < targetOrder) {
+            pageDirection = 1
+        } else if (sourceOrder > targetOrder) {
+            pageDirection = -1
+        }
+
     }
     document.body.dataset.pageOrder = targetOrder
 

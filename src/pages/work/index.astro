@@ -1,0 +1,41 @@
+---
+import Transition from "src/components/Transition.astro";
+import Layout from '$layout/Base.astro'
+
+const works = await Astro.glob('./*.md')
+
+---
+
+<Layout title="about" pageOrder={2}>
+    <ul>
+        {works.map((work,i) =>(
+        <Transition in={{delay: i * 50, transform:{translate:{x:-5}}}} out={{transform:{translate:{x:5}}}}>
+            <li>
+                <article>
+                    <svg width="100%" viewBox="0 0 256 256">
+                        <g transform="translate(128 128)">
+                            <rect width="192" height="192" fill="aliceblue" x="-96" y="-96" rx="4" />
+                            <circle r="32" />
+                        </g>
+                    </svg>
+                    <h2>{work.frontmatter.title}</h2>
+                    <a href={work.url}>more</a>
+                </article>
+            </li>
+        </Transition>
+        ))}
+    </ul>
+</Layout>
+
+<style lang="scss">
+    ul {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.25rem;
+
+        li {
+            border: 1px black dashed;
+            padding: 0.5rem;
+        }
+    }
+</style>

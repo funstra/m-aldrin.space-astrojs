@@ -6,6 +6,11 @@ export interface Props {
 }
 const { links } = Astro.props as Props
 const currentPage = new URL(Astro.request.url)
+const parts = currentPage.pathname.split('/').slice(1)
+let currentSub
+if (parts.length > 1) {
+    currentSub = parts[0]
+}
 ---
 
 <script>
@@ -21,10 +26,10 @@ const currentPage = new URL(Astro.request.url)
         </svg>
     </button>
 
-    <ul data-state="closed" class="links shadow-[16px] shadow-black/10 flex flex-col gap-3 p-2 rounded-sm">
+    <ul data-state="closed" class="links shadow-[16px] shadow-green-700/20 flex flex-col gap-2 p-2 rounded-sm">
         {links.map(link => {
-        return <a aria-current={ currentPage.pathname==link.href ? 'page' : false} class="p-1  rounded-sm border border-black border-dashed" href={link.href}>
-            <Icons width={20} height={20} type={link.name} />
+        return <a aria-current={ currentPage.pathname==link.href ? 'page' : false} class={`rounded-sm ${ link.href===`/${currentSub}` ? 'subroute' : '' }`} href={link.href}>
+            <Icons width={40} height={40} type={link.name} />
         </a>
         })}
     </ul>
@@ -50,30 +55,16 @@ const currentPage = new URL(Astro.request.url)
 
         display: grid;
 
-        // width: max-content;
         height: max-content;
         z-index: 10;
-
-        .links {
-            // animation-name: fetching;
-            // animation-duration: 1000ms;
-            // animation-iteration-count: infinite;
-            // transition-property: background-color;
-            // transition-duration: 500ms;
-        }
     }
 
 
     nav[data-state=fetching] .links {
 
-        // background-color: red;
-        // animation-name: fetching;
-        // animation-duration: 500ms;
-        // animation-iteration-count: infinite;
         &::before {
-            // background-position-y: 75%;
             animation-name: fetching;
-            animation-duration: 1500ms;
+            animation-duration: 2500ms;
             animation-iteration-count: infinite;
             animation-timing-function: linear;
             opacity: 1;
@@ -82,13 +73,8 @@ const currentPage = new URL(Astro.request.url)
     }
 
     nav[data-state=done] .links {
-
-        // transition-dur`ation: 125ms;
-        // background-color: red !important;
         &::before {
             transition-timing-function: ease-out;
-            // transition-duration: 125ms;
-            // background-position-y: 100%;
             opacity: 0;
         }
     }
@@ -97,7 +83,6 @@ const currentPage = new URL(Astro.request.url)
         grid-row: 1;
         grid-column: 1;
         align-self: flex-end;
-        // box-shadow: 0 0 0 30px black;
     }
 
     .links {
@@ -105,12 +90,12 @@ const currentPage = new URL(Astro.request.url)
         background-color: white;
         grid-row: 1;
         grid-column: 1;
-        // box-shadow: 0 0 16px -4px hsl(0 0% 0% / 0.2);
         transition: opacity, transform;
         transition-duration: 125ms;
         transition-timing-function: ease-out;
         align-items: center;
         overflow: hidden;
+        pointer-events: none;
 
         &::before {
             content: '';
@@ -133,19 +118,31 @@ const currentPage = new URL(Astro.request.url)
 
     .links[data-state=open] {
         opacity: 1;
+        pointer-events: all;
     }
 
     .links[data-state=closed] {
-        pointer-events: none;
         opacity: 0;
-        transform: translateY(5px);
+        transform: translateY(3px);
     }
 
-    @media(min-width:512px) {
+    @screen sm {
+        nav {
+            grid-row: 1;
+            grid-column: 1;
+            align-self: flex-start;
+            justify-self: flex-start;
+        }
+
+        button {
+            display: none;
+        }
+
         .links {
             opacity: 1 !important;
             transform: none !important;
-            pointer-events: all !important;
+            pointer-events: all;
+            flex-direction: row;
         }
     }
 
@@ -154,7 +151,6 @@ const currentPage = new URL(Astro.request.url)
         display: block;
         --fg-col: black;
         --bg-col: transparent;
-        // color: var(--fg-col);
         background-color: var(--bg-col);
         transition-property: color, background-color;
         transition-duration: 75ms;
@@ -169,16 +165,21 @@ const currentPage = new URL(Astro.request.url)
             left: 0;
             transform: scaleY(0);
             transform-origin: bottom;
-            background-color: black;
+            @apply bg-secondary;
             position: absolute;
             transition-property: transform;
             transition-duration: 125ms;
         }
 
+        &.subroute {
+            outline-color: black;
+            outline-width: 1px;
+            outline-style: dashed;
+            --s: 0.5;
+        }
     }
 
     :global(.navigating-to) {
-
         &::after {
             transform: scaleY(0.75) !important;
         }
@@ -187,9 +188,9 @@ const currentPage = new URL(Astro.request.url)
 
     :global([aria-current="page"]) {
 
-        // color: white;
         :global(svg) {
-            stroke: white !important;
+            color: hsl(var(--col-wht)) !important;
+            --col-0: hsl(var(--col-secondary)) !important;
         }
 
         &::after {

@@ -1,23 +1,52 @@
 ---
 import Base from "$layout/Base.astro";
 import Transition from "src/components/Transition.astro";
+const pos: { x: number, y: number, attr?: Record<string, string> }[] = [
+	{ x: 0, y: 2, attr: { 'fill': 'hsl(var(--col-secondary))', 'stroke': 'none' } },
+	{ x: 0, y: 0, attr: {} },
+	{ x: 1, y: 1, attr: {} },
+	{ x: -1, y: 1, attr: {} }
+]
 ---
 
-<Base title="m" pageOrder={0}>
-<div class="flex h-full">
-	<svg viewBox="0 0 256 256">
-		<g transform="translate(128 128)">
-			<circle r="64" />
-		</g>
-	</svg>
-</div>
+<Base title="m" pageOrder={0} class="text-red-500">
+<Transition in={{duration:200,transform:{translate:{x:-5}}}} out={{duration:200,transform:{translate:{x:5}}}}>
+	<div class="flex h-full">
+		<svg class="w-full" viewBox="0 0 256 256">
+			<g transform="translate(128 128)" class="stroke-primary">
+				<g transform="translate(0 -80)">
+
+					<Transition in={{duration:500,transform:{translate:{x:0}}}} out={{duration:300}}>
+						<g transform="translate(0 0)" >
+							<polygon points="0,-16 32,32 0,80 -32,32"   transform="scale(2.5)" transform-origin="0 0" vector-effect="non-scaling-stroke" />
+						</g>
+					</Transition>
+
+					{ pos.map(p => (
+					<g transform={`translate(${p.x*32} ${p.y*48})`}>
+						<g transform="translate(0 0)">
+							<polygon { ...p?.attr } points="0,-16 32,32 0,80 -32,32" />
+							<circle r="4" {...p?.attr} />
+						</g>
+					</g>
+					)) }
+
+				</g>
+			</g>
+		</svg>
+	</div>
+</Transition>
 </Base>
 
 <style lang="scss">
 	svg {
+		overflow: visible;
 		width: 100%;
 		height: 100%;
 		fill: none;
 		stroke: black;
+		stroke-width: 2;
+		stroke-linejoin: round;
+		stroke-linecap: round;
 	}
 </style>

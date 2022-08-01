@@ -1,11 +1,22 @@
 const nav = document.querySelector('nav')
 document.addEventListener('rooting', e => {
+    nav.querySelector('ul').style.pointerEvents = 'none'
     const link = nav.querySelector(`a[href="${location.pathname}"]`)
     if (link) {
+        nav.querySelector('a.subroute')?.classList.remove('subroute')
         link.classList.add('navigating-to')
+    } else {
+        const parts = location.pathname.split('/').slice(1)
+        if (parts.length > 1) {
+            console.log(parts[0]);
+            const _link = nav.querySelector(`a[href="/${parts[0]}"]`)
+            console.log(_link);
+            _link.classList.add('subroute')
+        }
     }
 })
 document.addEventListener('navigating-done', e => {
+    nav.querySelector('ul').style.removeProperty('pointer-events')
     nav.querySelector('[aria-current="page"]')?.removeAttribute('aria-current')
     nav.querySelector('.navigating-to')?.setAttribute('aria-current', 'page')
     nav.querySelector('.navigating-to')?.classList.remove('navigating-to')
